@@ -10,18 +10,22 @@ import (
 
 type Repository struct{}
 
-func (r Repository) GetStressed(unstressed string) AccentPairs {
-	const COLLECTION = "AccentPairs"
+func GetConnection() *mgo.Session {
 	conf := config.GetConfig()
 	SERVER := "mongodb://" + conf.DataBaseAddr
 	CRED := &mgo.Credential{Username: conf.Username, Password: conf.Password}
-	DBNAME := "Russian"
 	session, err := mgo.Dial(SERVER)
 	session.Login(CRED)
 	if err != nil {
 		fmt.Println("Failed to establish connection to Mongo server:", err)
 	}
+	return session
+}
 
+func (r Repository) GetStressed(unstressed string) AccentPairs {
+	const COLLECTION = "AccentPairs"
+	DBNAME := "Russian"
+	session := GetConnection()
 	defer session.Close()
 
 	c := session.DB(DBNAME).C(COLLECTION)
@@ -41,15 +45,9 @@ func (r Repository) GetStressed(unstressed string) AccentPairs {
 }
 
 func (r Repository) GetWordByID(id int) Word {
-	session, err := mgo.Dial(SERVER)
-
 	const COLLECTION = "Words"
-
-	if err != nil {
-		fmt.Println("Failed to establish connection to Mongo server:", err)
-	}
-
-	defer session.Close()
+	DBNAME := "Russian"
+	session := GetConnection()
 
 	c := session.DB(DBNAME).C(COLLECTION)
 	var result Word
@@ -67,12 +65,9 @@ func (r Repository) GetWordByID(id int) Word {
 }
 
 func (r Repository) GetText(textName string) RussianTexts {
-	session, err := mgo.Dial(SERVER)
-
 	const COLLECTION = "Texts"
-	if err != nil {
-		fmt.Println("Failed to establish connection to Mongo server:", err)
-	}
+	DBNAME := "Russian"
+	session := GetConnection()
 
 	defer session.Close()
 
