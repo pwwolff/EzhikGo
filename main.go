@@ -1,10 +1,11 @@
 package main
 
 import (
+	"EzhikGo/store"
 	"log"
 	"net/http"
 	"os"
-	"rest-and-go/store"
+
 	"github.com/gorilla/handlers"
 )
 
