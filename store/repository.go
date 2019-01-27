@@ -2,33 +2,41 @@ package store
 
 import (
 	"fmt"
+	"log"
 
+	mgo "github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
 	"github.com/pwwolff/EzhikGo/config"
-	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
+
+var session *mgo.Session
 
 type Repository struct{}
 
-func GetConnection() *mgo.Session {
+func GetConnection() *mgo.Database {
+
 	conf := config.GetConfig()
-	SERVER := "mongodb://" + conf.DataBaseAddr
-	CRED := &mgo.Credential{Username: conf.Username, Password: conf.Password}
-	session, err := mgo.Dial(SERVER)
-	session.Login(CRED)
-	if err != nil {
-		fmt.Println("Failed to establish connection to Mongo server:", err)
+	if session == nil {
+		SERVER := "mongodb://" + conf.DataBaseAddr
+		CRED := &mgo.Credential{Username: conf.Username, Password: conf.Password}
+		session, err := mgo.Dial(SERVER)
+		if err != nil {
+			log.Fatal(err)
+			return nil
+		}
+		session.Login(CRED)
+		return session.DB(conf.DataBaseName)
 	}
-	return session
+
+	newSession := session.Copy()
+	return newSession.DB(conf.DataBaseName)
 }
 
 func (r Repository) GetStressed(unstressed string) AccentPairs {
 	const COLLECTION = "AccentPairs"
-	DBNAME := "Russian"
-	session := GetConnection()
-	defer session.Close()
-
-	c := session.DB(DBNAME).C(COLLECTION)
+	db := GetConnection()
+	defer db.Session.Close()
+	c := db.C(COLLECTION)
 
 	results := AccentPairs{}
 
@@ -46,10 +54,10 @@ func (r Repository) GetStressed(unstressed string) AccentPairs {
 
 func (r Repository) GetWordByID(id int) Word {
 	const COLLECTION = "Words"
-	DBNAME := "Russian"
-	session := GetConnection()
+	db := GetConnection()
+	defer db.Session.Close()
+	c := db.C(COLLECTION)
 
-	c := session.DB(DBNAME).C(COLLECTION)
 	var result Word
 
 	if err := c.Find(bson.M{"word_id": id}).One(&result); err != nil {
@@ -66,12 +74,10 @@ func (r Repository) GetWordByID(id int) Word {
 
 func (r Repository) GetText(textName string) RussianTexts {
 	const COLLECTION = "Texts"
-	DBNAME := "Russian"
-	session := GetConnection()
+	db := GetConnection()
+	defer db.Session.Close()
 
-	defer session.Close()
-
-	c := session.DB(DBNAME).C(COLLECTION)
+	c := db.C(COLLECTION)
 	results := RussianTexts{}
 
 	if err := c.Find(bson.M{"urlTitle": textName}).All(&results); err != nil {
