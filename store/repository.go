@@ -3,20 +3,21 @@ package store
 import (
 	"fmt"
 
+	"github.com/pwwolff/EzhikGo/config"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
 type Repository struct{}
 
-const SERVER = "mongodb://localhost:27017"
-
-const DBNAME = "Russian"
-
 func (r Repository) GetStressed(unstressed string) AccentPairs {
-	session, err := mgo.Dial(SERVER)
 	const COLLECTION = "AccentPairs"
-
+	conf := config.GetConfig()
+	SERVER := "mongodb://" + conf.DataBaseAddr
+	CRED := &mgo.Credential{Username: conf.Username, Password: conf.Password}
+	DBNAME := "Russian"
+	session, err := mgo.Dial(SERVER)
+	session.Login(CRED)
 	if err != nil {
 		fmt.Println("Failed to establish connection to Mongo server:", err)
 	}

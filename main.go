@@ -3,19 +3,15 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
+	"github.com/pwwolff/EzhikGo/config"
 	"github.com/pwwolff/EzhikGo/store"
 
 	"github.com/gorilla/handlers"
 )
 
 func main() {
-	port := os.Getenv("PORT")
-
-	if port == "" {
-		log.Fatal("$PORT must be set")
-	}
+	port := config.GetConfig().Port
 
 	router := store.NewRouter()
 
