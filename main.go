@@ -12,7 +12,6 @@ import (
 
 func main() {
 	port := config.GetConfig().Port
-
 	router := store.NewRouter()
 
 	allowedOrigins := handlers.AllowedOrigins([]string{"*"})

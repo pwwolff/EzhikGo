@@ -22,19 +22,19 @@ var routes = Routes{
 	Route{
 		"SearchUnstressed",
 		"GET",
-		"/Search/{unstressed}",
+		"/API/Search/{unstressed}",
 		controller.SearchUnstressed,
 	},
 	Route{
 		"GetText",
 		"GET",
-		"/GetText/{TextName}",
+		"/API/GetText/{TextName}",
 		controller.GetText,
 	},
 	Route{
 		"GetWordById",
 		"GET",
-		"/GetWord/{WordId}",
+		"/API/GetWord/{WordId}",
 		controller.GetWordById,
 	},
 }

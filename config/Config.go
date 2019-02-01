@@ -23,7 +23,7 @@ func GetConfig() Configuration {
 		return config
 	}
 
-	file, err := ioutil.ReadFile("config/configuration.json")
+	file, err := ioutil.ReadFile("./config/configuration.json")
 	if err != nil {
 		log.Fatal("Config File Missing. ", err)
 	}
